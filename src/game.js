@@ -194,6 +194,7 @@
             var index = this.step % this.numOffscreenPillars;
             var pillars = this.pillars.children;
             var distance = pillars[index + 1].x - pillars[index].x
+            this.step = this.step + 1;
             this.bgs.forEach(function(item) {
                 item.startMove(distance);
             })
