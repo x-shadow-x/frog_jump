@@ -1,8 +1,8 @@
 (function() {
 
-    window.onload = function() {
-        game.init();
-    }
+    // window.onload = function() {
+    //     game.init();
+    // }
 
     var game = window.game = {
         width: 0,
@@ -24,6 +24,7 @@
         stage: null,
         ticker: null,
         state: null,
+        clickButtonSound: null,
         score: 0,
 
         bg: null,
@@ -37,15 +38,38 @@
             this.asset = new game.Asset();
             this.asset.on('complete', function(e) {
                 this.asset.off('complete');
+                this.initMusic();
                 this.initStage();
             }.bind(this));
             this.asset.load();
         },
 
+        initMusic: function() {
+            Hilo.WebSound.getAudio({
+                src: '../music/bg.mp3',
+                loop: true,
+                volume: 1
+            }).on('load', function(e) {
+                console.log('load');
+            }).on('end', function(e) {
+                console.log('end');
+            }).play();
+
+            this.clickButtonSound = Hilo.WebSound.getAudio({
+                src: '../music/button.mp3',
+                loop: false,
+                volume: 1
+            });
+        },
+
+        playClickButtonSound: function() {
+            this.clickButtonSound.play();
+        },
+
         initStage: function() {
             this.width = Math.min(innerWidth, 450) * 2;
             this.maxPillarDistance = this.width * 0.5;
-            this.height = Math.min(innerHeight, 750) * 2;
+            this.height = Math.min(innerHeight, 812) * 2;
             this.scale = 0.5;
 
             //舞台画布
@@ -77,7 +101,8 @@
             //初始化
             this.initBackground();
             this.initPillars();
-
+            this.initFrog();
+            this.initCurrentScore();
             //准备游戏
             this.gameReady();
         },
@@ -85,8 +110,6 @@
         initBackground: function() {
             this.initBg();
             this.initRiver();
-            this.initFrog();
-            this.initCurrentScore();
         },
 
         initRiver: function() {
@@ -199,22 +222,12 @@
         gameReady: function() {
             this.state = 'ready';
             this.frog.getReady();
-
             this.currentScore.visible = true;
             this.currentScore.setText(this.score);
-
-            // this.gameOverScene.hide();
-            // this.score = 0;
-            // this.currentScore.visible = true;
-            // this.currentScore.setText(this.score);
-            // this.gameReadyScene.visible = true;
-            // this.pillars.reset();
-            // this.river.getReady();
         },
 
         gameStart: function() {
             this.state = 'playing';
-            // this.gameReadyScene.visible = false;
         },
 
         gameOver: function() {
@@ -223,15 +236,8 @@
         },
 
         handleTouchStart: function(e) {
-            // var index = this.step % this.numOffscreenPillars;
-            // var pillars = this.pillars.children;
-            // var distance = pillars[index + 1].x - pillars[index].x
-            // this.step = this.step + 1;
-            // this.bg.startMove(distance);
-            // this.pillars.startMove(distance);
             this.touchTime = e.timeStamp;
             this.frog.readyJump();
-            // this.frog.jump();
         },
 
         handleTouchEnd: function(e) {

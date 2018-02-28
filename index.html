@@ -22,25 +22,84 @@
 	body {
 		background: #006392;
 	}
-</style>
 
-<script type="text/javascript" src="hilo/hilo-standalone.js"></script>
-<script type="text/javascript" src="hilo/hilo-flash.js" data-auto="true"></script>
-<script type="text/javascript" src="src/game.js"></script>
-<script type="text/javascript" src="src/Asset.js"></script>
-<script type="text/javascript" src="src/Bg.js"></script>
-<script type="text/javascript" src="src/River.js"></script>
-<script type="text/javascript" src="src/Pillars.js"></script>
-<script type="text/javascript" src="src/Frog.js"></script>
-<script type="text/javascript">
-	document.addEventListener('touchstart', function(e) {
-		e.preventDefault();
-		return false;
-	}, false);
-</script>
+	.game_start_panel,
+	.game_over_panel {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 1000;
+		text-align: center;
+	}
+
+	.game_start_panel {
+		background: url('./images/bg3.jpg') center bottom no-repeat #3d6ea8;
+		background-size: 100% auto;
+	}
+
+	.game_start_panel.hide {
+		display: none;
+	}
+
+	.title_img {
+		width: 240px;
+		margin-top: 20%;
+	}
+
+	.tip_img {
+		position: absolute;
+		width: 40px;
+		left: 70%;
+		top: 50%;
+		transition: translateY(-50%);
+		animation: move 1s infinite;
+		-webkit-animation: move 1s linear infinite alternate;
+	}
+
+	@keyframes move {
+		from {top: 50%; left: 70%;}
+		to {top: 48%; left: 68%;}
+	}
+
+	@-webkit-keyframes move {
+		from {top: 50%; left: 70%;}
+		to {top: 48%; left: 68%;}
+	}
+</style>
 </head>
 
 <body>
+	<div class="game_start_panel" id="gameStartPanel">
+		<img src="images/fingger.png" alt="操作提示" class="tip_img">
+	</div>
+	<!-- <div class="game_over_panel"></div> -->
+
+	<script type="text/javascript" src="hilo/hilo-standalone.js"></script>
+	<script type="text/javascript" src="hilo/hilo-flash.js" data-auto="true"></script>
+	<script type="text/javascript" src="src/game.js"></script>
+	<script type="text/javascript" src="src/Asset.js"></script>
+	<script type="text/javascript" src="src/Bg.js"></script>
+	<script type="text/javascript" src="src/River.js"></script>
+	<script type="text/javascript" src="src/Pillars.js"></script>
+	<script type="text/javascript" src="src/Frog.js"></script>
+	<script type="text/javascript">
+		document.body.addEventListener('touchstart', function(e) {
+			e.preventDefault();
+			return false;
+		}, false);
+
+		window.onload = function() {
+	        game.init();
+	        document.getElementById('gameStartPanel').addEventListener('click', function(e) {
+	        	console.log(this.className = this.className + ' hide');
+				game.playClickButtonSound();
+			}, false);
+	    }
+
+		
+	</script>
 </body>
 
 </html>
