@@ -16,6 +16,7 @@
         numOffscreenPillars: 1,
 
         step: 0, // 跳跃的步数
+        distance: 0, // 青蛙跳跃的水平距离
 
         touchTime: 0,
 
@@ -76,9 +77,6 @@
             //初始化
             this.initBackground();
             this.initPillars();
-
-            //舞台更新
-            this.stage.onUpdate = this.onUpdate.bind(this);
 
             //准备游戏
             this.gameReady();
@@ -156,22 +154,36 @@
         },
 
         initFrog: function() {
-            console.log(this.rivers[0].y);
             this.frog = new game.Frog({
                 id: "frog",
                 atlas: this.asset.frogAtlas,
                 startX: this.width * 0.1 - (this.asset.pillar.width - 100) / 2, // 屏幕中起始柱子的横坐标
                 startY: this.height - this.asset.pillar.height - 98,
-                riverY: this.rivers[0].y
+                clientHeight: this.height,
+                floorY: this.height - this.asset.pillar.height - 98
+                // floorY: this.rivers[0].y
             }).addTo(this.stage);
+
+            this.frog.on('jumpEnd', function(data) {
+                var result = data.detail.result;
+                if (result > 0) {
+                    // 加分
+                    this.currentScore.setText(this.calcScore());
+                    // 更新场景值
+                    this.updateScene();
+                } else if (result < 0) {
+                    // 游戏结束
+                    this.gameOver();
+                }
+            }.bind(this));
         },
 
-        initCurrentScore: function(){
+        initCurrentScore: function() {
             //当前分数
             this.currentScore = new Hilo.BitmapText({
                 id: 'score',
                 glyphs: this.asset.numberGlyphs,
-                textAlign:'center'
+                textAlign: 'center'
             }).addTo(this.stage);
 
             //设置当前分数的位置
@@ -179,11 +191,9 @@
             this.currentScore.y = 180;
         },
 
-        onUpdate: function() {
-            // if(this.state === 'ready'){
-            //     return;
-            // }
-            this.pillars.hitTest(this.frog);
+        calcScore: function() {
+            this.score = this.score + 1;
+            return this.score;
         },
 
         gameReady: function() {
@@ -208,18 +218,8 @@
         },
 
         gameOver: function() {
-            // if(this.state !== 'over'){
-            //     //设置当前状态为结束over
-            //     this.state = 'over';
-            //     //停止障碍的移动
-            //     this.pillars.stopMove();
-            //     //小鸟跳转到第一帧并暂停
-            //     this.bird.goto(0, true);
-            //     //隐藏屏幕中间显示的分数
-            //     this.currentScore.visible = false;
-            //     //显示结束场景
-            //     this.gameOverScene.show(this.calcScore(), this.saveBestScore());
-            // }
+            //显示结束场景
+            // this.gameOverScene.show(this.calcScore(), this.saveBestScore());
         },
 
         handleTouchStart: function(e) {
@@ -236,9 +236,20 @@
 
         handleTouchEnd: function(e) {
             var touchDuration = e.timeStamp - this.touchTime;
-            var distance = touchDuration * 0.5;
-            this.frog.jump(distance);
-            console.log(touchDuration);
+            this.distance = touchDuration * 0.5;
+            this.frog.jump(this.distance);
+
+            var result = this.pillars.hitTest(this.frog.x + this.distance, 100);
+            // 更新青蛙最后掉落的y坐标为掉下河
+            this.frog.upDateFloorY(result);
+        },
+
+        // 更新整个游戏场景，还原到青蛙站在屏幕中的第一根柱子
+        updateScene: function() {
+            var updateDistance = this.pillars.children[1].x - this.pillars.children[0].x;
+            this.bg.startMove(updateDistance);
+            this.pillars.startMove(updateDistance);
+            this.frog.startMove(updateDistance);
         }
 
     };

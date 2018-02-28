@@ -54,7 +54,7 @@
                 prePillar = children[index - 1];
                 pillarX = prePillar.x + this.pillarWidth + minSpace + (maxSpace - minSpace) * Math.random() >> 0;
             } else if (index === 2) {
-                
+
                 var minX = this.clientWidth - this.x;
                 var range = children[index - 1].x - children[index - 2].x - this.pillarWidth - this.minSpace;
                 pillarX = minX + range * Math.random() >> 0;
@@ -70,8 +70,23 @@
             this.placePillars(pillar, this.numPillars - 1);
         },
 
-        hitTest: function(frog) {
-            // if(frog.x + frog.width > this.children[0])
+        // 判断跳跃结果
+        hitTest: function(destX, frogWidth) {
+            // console.log(destX, frogWidth);
+            // console.log(this.children[0], this.children[1]);
+            // console.log('=================================================');
+            var firstPillarX = this.children[0].x + this.x;
+            var secondPillarX = this.children[1].x + this.x;
+            if (destX + frogWidth >= secondPillarX && destX <= secondPillarX + this.pillarWidth) {
+                // 成功跳到下一个柱子
+                return 1;
+            } else if (destX <= firstPillarX + this.pillarWidth) {
+                // 还在当前柱子
+                return 0;
+            } else {
+                // 掉下去了
+                return -1;
+            }
         },
 
         startMove: function(distance) {
