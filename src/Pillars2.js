@@ -31,6 +31,8 @@
 
                 this.placePillars(pillar, i);
             }
+
+            this.log();
         },
 
         log: function() {
@@ -39,6 +41,31 @@
             });
             console.log('===============');
         },
+
+        /*placePillars: function(pillar, index) {
+            var pillarX = this.startX;
+            var startX = 0;
+            var dis = 0;
+            var minSpace = this.minSpace;
+            var maxSpace = this.maxSpace;
+            var children = this.children;
+            var prePillar = null;
+
+            if (index >= this.numOffscreenPillars) {
+                prePillar = children[index - 1];
+                minSpace = this.clientWidth - (prePillar.x - this.x);
+                // maxSpace = minSpace + prePillar.x - children[index - 2].x - this.pillarWidth;
+                // pillarX = prePillar.x + minSpace + (maxSpace - minSpace) * Math.random() >> 0;
+                // 上面两步简化计算为：
+                pillarX = prePillar.x + minSpace + (prePillar.x - children[index - 2].x - this.pillarWidth) * Math.random() >> 0;
+            } else if (index > 0) {
+                prePillar = children[index - 1];
+                pillarX = prePillar.x + this.pillarWidth + minSpace + (maxSpace - minSpace) * Math.random() >> 0;
+            }
+
+            pillar.x = pillarX;
+            pillar.y = this.pillarY;
+        },*/
 
         placePillars: function(pillar, index) {
             var pillarX = this.startX;
@@ -54,9 +81,15 @@
                 prePillar = children[index - 1];
                 pillarX = prePillar.x + this.pillarWidth + minSpace + (maxSpace - minSpace) * Math.random() >> 0;
             } else if (index === 2) {
-                
-                var minX = this.clientWidth - this.x;
-                var range = children[index - 1].x - children[index - 2].x - this.pillarWidth - this.minSpace;
+                // minSpace = 0;
+                // var distance1 = children[1].x - children[0].x;
+                // maxSpace = distance1 - this.pillarWidth - this.clientWidth * 0.1;
+                var minX = this.clientWidth;
+                var range = children[1].x - children[0].x - this.pillarWidth - this.minSpace;
+                pillarX = minX + range * Math.random() >> 0;
+            } else if(index === 3) {
+                var minX = Math.max(children[2].x + this.pillarWidth + this.minSpace, this.clientWidth + (children[1].x - children[0].x));
+                var range = children[2].x - children[1].x - this.pillarWidth - this.minSpace;
                 pillarX = minX + range * Math.random() >> 0;
             }
 
@@ -65,13 +98,19 @@
         },
 
         resetPillars: function() {
-            var pillar = this.getChildAt(0);
-            this.setChildIndex(pillar, this.numPillars - 1);
-            this.placePillars(pillar, this.numPillars - 1);
-        },
+            var children = this.children;
+            var total = children.length;
+            var judgePillar = children[this.numOffscreenPillars];
+            if (this.x <= (-judgePillar.x)) {
+                children[1].x = children[0].x + (children[3].x - children[2].x);
+                this.x = 0;
 
-        hitTest: function(frog) {
-            // if(frog.x + frog.width > this.children[0])
+                for (var i = this.numOffscreenPillars, len = children.length; i < len; i++) {
+                    this.placePillars(children[i], i);
+                }
+            }
+
+            this.log();
         },
 
         startMove: function(distance) {

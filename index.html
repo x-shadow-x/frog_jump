@@ -1,6 +1,6 @@
 <!doctype html>
 <head>
-<title>Flappy Bird</title>
+<title>Frogger Jump</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1, maximum-scale=1" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,7 +31,13 @@
 <script type="text/javascript" src="src/Bg.js"></script>
 <script type="text/javascript" src="src/River.js"></script>
 <script type="text/javascript" src="src/Pillars.js"></script>
-<!-- <script type="text/javascript" src="src/Frog.js"></script> -->
+<script type="text/javascript" src="src/Frog.js"></script>
+<script type="text/javascript">
+	document.addEventListener('touchstart', function(e) {
+		e.preventDefault();
+		return false;
+	}, false);
+</script>
 </head>
 
 <body>

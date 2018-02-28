@@ -15,8 +15,8 @@
         },
 
         resetBg: function() {
-            if (this.x <= -this.image.width) {
-                this.x = this.x + 2 * this.image.width;
+            if (this.x <= -this.image.width / 3) {
+                this.x = this.x % (this.image.width / 3)
             }
         },
 

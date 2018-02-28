@@ -12,10 +12,12 @@
         bgBottom: 59, // 背景距离底部的距离
         riverSpace: 20, // 将来将参数配置成变量用
 
-        numPillars: 4,
-        numOffscreenPillars: 2,
+        numPillars: 3,
+        numOffscreenPillars: 1,
 
         step: 0, // 跳跃的步数
+
+        touchTime: 0,
 
         asset: null,
         stage: null,
@@ -67,11 +69,16 @@
             this.ticker.start(true);
 
             this.stage.enableDOMEvent(Hilo.event.POINTER_START, true);
+            this.stage.enableDOMEvent(Hilo.event.POINTER_END, true);
             this.stage.on(Hilo.event.POINTER_START, this.handleTouchStart.bind(this));
+            this.stage.on(Hilo.event.POINTER_END, this.handleTouchEnd.bind(this));
 
             //初始化
             this.initBackground();
             this.initPillars();
+
+            //舞台更新
+            this.stage.onUpdate = this.onUpdate.bind(this);
 
             //准备游戏
             this.gameReady();
@@ -80,6 +87,8 @@
         initBackground: function() {
             this.initBg();
             this.initRiver();
+            this.initFrog();
+            this.initCurrentScore();
         },
 
         initRiver: function() {
@@ -123,24 +132,13 @@
 
         initBg: function() {
             var bgHeight = this.asset.bg.height;
-            this.bgs = [
-                new game.Bg({
-                    id: 'bg1',
-                    image: this.asset.bg,
-                    x: 0,
-                    y: this.height - bgHeight - this.bgBottom
-                }),
-                new game.Bg({
-                    id: 'bg2',
-                    image: this.asset.bg,
-                    x: this.asset.bg.width,
-                    y: this.height - bgHeight - this.bgBottom
-                })
-            ];
 
-            this.bgs.forEach(function(item) {
-                item.addTo(this.stage);
-            }.bind(this));
+            this.bg = new game.Bg({
+                id: 'bg',
+                image: this.asset.bg,
+                x: 0,
+                y: this.height - bgHeight - this.bgBottom
+            }).addTo(this.stage);
         },
 
         initPillars: function() {
@@ -157,8 +155,43 @@
             }).addTo(this.stage);
         },
 
+        initFrog: function() {
+            console.log(this.rivers[0].y);
+            this.frog = new game.Frog({
+                id: "frog",
+                atlas: this.asset.frogAtlas,
+                startX: this.width * 0.1 - (this.asset.pillar.width - 100) / 2, // 屏幕中起始柱子的横坐标
+                startY: this.height - this.asset.pillar.height - 98,
+                riverY: this.rivers[0].y
+            }).addTo(this.stage);
+        },
+
+        initCurrentScore: function(){
+            //当前分数
+            this.currentScore = new Hilo.BitmapText({
+                id: 'score',
+                glyphs: this.asset.numberGlyphs,
+                textAlign:'center'
+            }).addTo(this.stage);
+
+            //设置当前分数的位置
+            this.currentScore.x = this.width - this.currentScore.width >> 1;
+            this.currentScore.y = 180;
+        },
+
+        onUpdate: function() {
+            // if(this.state === 'ready'){
+            //     return;
+            // }
+            this.pillars.hitTest(this.frog);
+        },
+
         gameReady: function() {
             this.state = 'ready';
+            this.frog.getReady();
+
+            this.currentScore.visible = true;
+            this.currentScore.setText(this.score);
 
             // this.gameOverScene.hide();
             // this.score = 0;
@@ -189,16 +222,23 @@
             // }
         },
 
-        handleTouchStart: function() {
-            console.log(this.pillars);
-            var index = this.step % this.numOffscreenPillars;
-            var pillars = this.pillars.children;
-            var distance = pillars[index + 1].x - pillars[index].x
-            this.step = this.step + 1;
-            this.bgs.forEach(function(item) {
-                item.startMove(distance);
-            })
-            this.pillars.startMove(distance);
+        handleTouchStart: function(e) {
+            // var index = this.step % this.numOffscreenPillars;
+            // var pillars = this.pillars.children;
+            // var distance = pillars[index + 1].x - pillars[index].x
+            // this.step = this.step + 1;
+            // this.bg.startMove(distance);
+            // this.pillars.startMove(distance);
+            this.touchTime = e.timeStamp;
+            this.frog.readyJump();
+            // this.frog.jump();
+        },
+
+        handleTouchEnd: function(e) {
+            var touchDuration = e.timeStamp - this.touchTime;
+            var distance = touchDuration * 0.5;
+            this.frog.jump(distance);
+            console.log(touchDuration);
         }
 
     };

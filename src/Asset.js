@@ -8,8 +8,8 @@
         ready: null,
         over: null,
         numberGlyphs: null,
-        birdAtlas: null,
-        holdback: null,
+        frogAtlas: null,
+        pillar: null,
 
         load: function(){
             var resources = [
@@ -41,19 +41,21 @@
                     river: [0, 1, 2]
                 }
             });
-            this.frog = this.queue.get('frog').content;
 
-            // this.frogAtlas = new Hilo.TextureAtlas({
-            //     image: this.queue.get('frog').content,
-            //     frames: [
-            //         [0, 0, 100, 96], 
-            //         [0, 60, 86, 60], 
-            //         [0, 0, 86, 60]
-            //     ],
-            //     sprites: {
-            //         frog: [0, 1, 2]
-            //     }
-            // });
+            this.frogAtlas = new Hilo.TextureAtlas({
+                image: this.queue.get('frog').content,
+                frames: [
+                    [0, 0, 144, 132], 
+                    [0, 132, 144, 132], 
+                    [0, 264, 144, 132],
+                    [0, 396, 144, 132]
+                ],
+                sprites: {
+                    frog: [0, 1, 2, 3]
+                }
+            });
+
+            console.log(this.frogAtlas);
 
             var number = this.queue.get('number').content;
             this.numberGlyphs = {
