@@ -46,25 +46,25 @@
 
         initMusic: function() {
             Hilo.WebSound.getAudio({
-                src: '/music/bg.mp3',
+                src: './music/bg.mp3',
                 loop: true,
                 volume: 1
             }).play();
 
             this.clickButtonSound = Hilo.WebSound.getAudio({
-                src: '/music/button.mp3',
+                src: './music/button.mp3',
                 loop: false,
                 volume: 1
             });
 
             this.jumpSound = Hilo.WebSound.getAudio({
-                src: '/music/jump.mp3',
+                src: './music/jump.mp3',
                 loop: false,
                 volume: 1
             });
 
             this.fallToWaterSound = Hilo.WebSound.getAudio({
-                src: '/music/fall_to_water.mp3',
+                src: './music/fall_to_water.mp3',
                 loop: false,
                 volume: 1
             });
