@@ -33,13 +33,6 @@
             }
         },
 
-        log: function() {
-            this.children.forEach((item) => {
-                console.log(item.x);
-            });
-            console.log('===============');
-        },
-
         placePillars: function(pillar, index) {
             var pillarX = this.startX;
             var minSpace = this.minSpace;
@@ -72,9 +65,6 @@
 
         // 判断跳跃结果
         hitTest: function(destX, frogWidth) {
-            // console.log(destX, frogWidth);
-            // console.log(this.children[0], this.children[1]);
-            // console.log('=================================================');
             var firstPillarX = this.children[0].x + this.x;
             var secondPillarX = this.children[1].x + this.x;
             if (destX + frogWidth >= secondPillarX && destX <= secondPillarX + this.pillarWidth) {

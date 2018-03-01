@@ -5,9 +5,10 @@
         Mixes: Hilo.EventMixin,
         constructor: function(properties) {
             Frog.superclass.constructor.call(this, properties);
-            // this.orianglStartX = properties.startX;
-            this.startX = properties.startX;
-            this.startY = properties.startY;
+            this.orianglStartX = properties.startX;
+            this.startX = this.orianglStartX;
+            this.orianglStartY = properties.startY;
+            this.startY = this.orianglStartY;
             this.floorY = this.startY; // 青蛙起跳后掉回来的 y坐标~默认掉回柱子上~如果碰撞检测到未跳到柱子上~调用相应函数将值设置为底板即掉下河
             this.clientHeight = properties.clientHeight; // 屏幕高度~用来判断青蛙是否掉下河了
             this.addFrame(properties.atlas.getSprite('frog'));
@@ -47,6 +48,13 @@
 
             //启动缓动动画
             this.moveTween.start();
+        },
+
+        reset: function() {
+            this.startX = this.orianglStartX;
+            this.startY = this.orianglStartY;
+            this.floorY = this.orianglStartY;
+            this.getReady();
         },
 
         resetFrog: function(startX) {

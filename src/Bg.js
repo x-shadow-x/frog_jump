@@ -7,11 +7,16 @@
             Bg.superclass.constructor.call(this, properties);
             this.image = properties.image;
             this.y = properties.y;
-            this.x = properties.x;
+            this.orianglX = properties.x;
+            this.x = this.orianglX;
 
             this.moveTween = new Hilo.Tween(this, null, {
                 onComplete: this.resetBg.bind(this)
             });
+        },
+
+        reset: function() {
+            this.x = this.orianglX;
         },
 
         resetBg: function() {

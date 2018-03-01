@@ -23,16 +23,16 @@
         asset: null,
         stage: null,
         ticker: null,
-        state: null,
-        clickButtonSound: null,
         score: 0,
 
         bg: null,
         rivers: null,
         bird: null,
         pillars: null,
-        gameReadyScene: null,
-        gameOverScene: null,
+
+        jumpSound: null,
+        clickButtonSound: null,
+        fallToWaterSound: null,
 
         init: function() {
             this.asset = new game.Asset();
@@ -49,10 +49,6 @@
                 src: '../music/bg.mp3',
                 loop: true,
                 volume: 1
-            }).on('load', function(e) {
-                console.log('load');
-            }).on('end', function(e) {
-                console.log('end');
             }).play();
 
             this.clickButtonSound = Hilo.WebSound.getAudio({
@@ -60,10 +56,30 @@
                 loop: false,
                 volume: 1
             });
+
+            this.jumpSound = Hilo.WebSound.getAudio({
+                src: '../music/jump.mp3',
+                loop: false,
+                volume: 1
+            });
+
+            this.fallToWaterSound = Hilo.WebSound.getAudio({
+                src: '../music/fall_to_water.mp3',
+                loop: false,
+                volume: 1
+            });
         },
 
         playClickButtonSound: function() {
             this.clickButtonSound.play();
+        },
+
+        playJumpSound: function() {
+            this.jumpSound.play();
+        },
+
+        playFallToWaterSound: function() {
+            this.fallToWaterSound.play();
         },
 
         initStage: function() {
@@ -189,6 +205,7 @@
 
             this.frog.on('jumpEnd', function(data) {
                 var result = data.detail.result;
+                console.log(result);
                 if (result > 0) {
                     // 加分
                     this.currentScore.setText(this.calcScore());
@@ -220,29 +237,43 @@
         },
 
         gameReady: function() {
-            this.state = 'ready';
             this.frog.getReady();
             this.currentScore.visible = true;
             this.currentScore.setText(this.score);
         },
 
-        gameStart: function() {
-            this.state = 'playing';
-        },
-
         gameOver: function() {
             //显示结束场景
-            // this.gameOverScene.show(this.calcScore(), this.saveBestScore());
+            var gameOverPanel = document.getElementById('gameOverPanel');
+            gameOverPanel.className = gameOverPanel.className.slice(0, gameOverPanel.className.indexOf(' hide'));
+            document.getElementById('score').innerHTML = this.score;
+            this.isGameOver = true;
+            this.playFallToWaterSound();
+        },
+
+        resetGame: function() {
+            this.isGameOver = false;
+            this.score = 0;
+            this.currentScore.setText(this.score);
+            this.frog.reset();
+            this.bg.reset();
         },
 
         handleTouchStart: function(e) {
+            if(this.isGameOver) {
+                return;
+            }
             this.touchTime = e.timeStamp;
             this.frog.readyJump();
         },
 
         handleTouchEnd: function(e) {
+            if(this.isGameOver) {
+                return;
+            }
             var touchDuration = e.timeStamp - this.touchTime;
             this.distance = touchDuration * 0.5;
+            this.playJumpSound();
             this.frog.jump(this.distance);
 
             var result = this.pillars.hitTest(this.frog.x + this.distance, 100);
