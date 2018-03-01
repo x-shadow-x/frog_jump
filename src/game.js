@@ -34,6 +34,8 @@
         clickButtonSound: null,
         fallToWaterSound: null,
 
+        isJumping: false,
+
         init: function() {
             this.asset = new game.Asset();
             this.asset.on('complete', function(e) {
@@ -46,25 +48,25 @@
 
         initMusic: function() {
             Hilo.WebSound.getAudio({
-                src: './music/bg.mp3',
+                src: '../music/bg.mp3',
                 loop: true,
                 volume: 1
             }).play();
 
             this.clickButtonSound = Hilo.WebSound.getAudio({
-                src: './music/button.mp3',
+                src: '../music/button.mp3',
                 loop: false,
                 volume: 1
             });
 
             this.jumpSound = Hilo.WebSound.getAudio({
-                src: './music/jump.mp3',
+                src: '../music/jump.mp3',
                 loop: false,
                 volume: 1
             });
 
             this.fallToWaterSound = Hilo.WebSound.getAudio({
-                src: './music/fall_to_water.mp3',
+                src: '../music/fall_to_water.mp3',
                 loop: false,
                 volume: 1
             });
@@ -206,6 +208,7 @@
             this.frog.on('jumpEnd', function(data) {
                 var result = data.detail.result;
                 console.log(result);
+                this.isJumping = false;
                 if (result > 0) {
                     // 加分
                     this.currentScore.setText(this.calcScore());
@@ -260,7 +263,7 @@
         },
 
         handleTouchStart: function(e) {
-            if(this.isGameOver) {
+            if(this.isGameOver || this.isJumping) {
                 return;
             }
             this.touchTime = e.timeStamp;
@@ -268,13 +271,14 @@
         },
 
         handleTouchEnd: function(e) {
-            if(this.isGameOver) {
+            if(this.isGameOver || this.isJumping) {
                 return;
             }
             var touchDuration = e.timeStamp - this.touchTime;
             this.distance = touchDuration * 0.5;
             this.playJumpSound();
             this.frog.jump(this.distance);
+            this.isJumping = true;
 
             var result = this.pillars.hitTest(this.frog.x + this.distance, 100);
             // 更新青蛙最后掉落的y坐标为掉下河

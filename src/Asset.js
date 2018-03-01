@@ -10,6 +10,7 @@
         numberGlyphs: null,
         frogAtlas: null,
         pillar: null,
+        bgSound: null,
 
         load: function(){
             var resources = [
@@ -23,24 +24,18 @@
             this.queue = new Hilo.LoadQueue();
             this.queue.add(resources);
             this.queue.on('complete', this.onComplete.bind(this));
+            this.queue.on('complete', this.onComplete.bind(this));
             this.queue.start();
+            this.queue.on('load', function(e){
+                console.log(e.detail);
+            });
         },
 
         onComplete: function(e){
             this.bg = this.queue.get('bg').content;
             this.river = this.queue.get('river').content;
             this.pillar = this.queue.get('pillar').content;
-            this.riverAtlas = new Hilo.TextureAtlas({
-                image: this.queue.get('river').content,
-                frames: [
-                    [0, 0, 400, 39], 
-                    [0, 39, 400, 39], 
-                    [0, 78, 400, 39]
-                ],
-                sprites: {
-                    river: [0, 1, 2]
-                }
-            });
+            
 
             this.frogAtlas = new Hilo.TextureAtlas({
                 image: this.queue.get('frog').content,
@@ -55,8 +50,6 @@
                 }
             });
 
-            console.log(this.frogAtlas);
-
             var number = this.queue.get('number').content;
             this.numberGlyphs = {
                 0: {image:number, rect:[0,0,60,91]},
@@ -70,6 +63,7 @@
                 8: {image:number, rect:[541,0,60,91]},
                 9: {image:number, rect:[611,0,60,91]}
             };
+
 
             this.queue.off('complete');
             this.fire('complete');
