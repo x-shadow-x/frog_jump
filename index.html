@@ -7,304 +7,32 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <link rel="apple-touch-icon" href="images/icon.png"/>
 <link rel="apple-touch-startup-image" href="images/icon.png" />
+<link rel="stylesheet" type="text/css" href="./css/index.css">
 
-<style type="text/css">
-	body, div, canvas{
-	    image-rendering: optimizeSpeed;
-	    -webkit-image-rendering: optimizeSpeed;
-	    -webkit-interpolation-mode: nearest-neighbor;
-	}
-	body {
-		padding:0;
-		margin:0;
-		background-color:#fff;
-	}
-	body, html {
-		height:100%;
-	}
-	canvas {
-		background: transparent;
-	}
-	body {
-		background: #006392;
-	}
-
-	.loading_hover,
-	.game_start_panel,
-	.game_over_panel {
-		position: fixed;
-		left: 0;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		z-index: 1000;
-		text-align: center;
-	}
-
-	.loading_hover {
-		z-index: 1001;
-	}
-
-	.game_start_panel {
-		background: url('./images/bg3.jpg') center bottom no-repeat #3d6ea8;
-		background-size: 100% auto;
-	}
-
-	.hide {
-		display: none;
-	}
-
-	.title_img {
-		width: 240px;
-		margin-top: 20%;
-	}
-
-	.tip_img {
-		position: absolute;
-		width: 40px;
-		left: 70%;
-		top: 50%;
-		transition: translateY(-50%);
-		animation: move 1s infinite;
-		-webkit-animation: move 1s linear infinite alternate;
-	}
-
-	@keyframes move {
-		from {top: 50%; left: 70%;}
-		to {top: 48%; left: 68%;}
-	}
-
-	@-webkit-keyframes move {
-		from {top: 50%; left: 70%;}
-		to {top: 48%; left: 68%;}
-	}
-
-	.result_box {
-		width: 50%;
-		margin: 46% auto 0 auto;
-		background: rgba(255, 162, 2, .6);
-		color: #fff;
-		font-size: 24px;
-		border: 4px solid #fff;
-		border-radius: 10px;
-		padding: 20px 0;
-	}
-
-	.replay_btn {
-		margin-top: 14%;
-		width: 80px;
-	}
-
-	.rank_link {
-		display: block;
-		width: 150px;
-		height: 57px;
-		background: url('./images/check_rank.png') center no-repeat;
-		background-size: 100% 100%;
-		margin: 10% auto;
-	}
-
-	.rank_list_out_box {
-		position: fixed;
-		left: 10%;
-		right: 10%;
-		top: 10%;
-		bottom: 10%;
-		z-index: 1001;
-		border: 2px solid #fff;
-	}
-
-	.rank_list_box {
-		height: 100%;
-		overflow-y: scroll;
-		-webkit-overflow-scrolling: touch;
-		background: rgba(255, 162, 2, .6);
-	}
-
-	.item {
-		position: relative;
-		color: #fff;
-		padding: 10px 20px;
-		background: #ffab1d;
-	}
-
-	.item:nth-child(odd) {
-		background: rgba(250, 132, 0, .6);
-	}
-
-	.rank_num,
-	.user_img,
-	.user_name {
-		display: inline-block;
-		vertical-align: middle;;
-	}
-
-	.rank_num {
-		font-size: 18px;
-		margin-right: 22px;
-		font-style: italic;
-	}
-
-	.item:nth-child(1) .rank_num {
-		color: #f7fa00;
-		font-size: 20px;
-		font-weight: bolder;
-		margin-right: 20px;
-	}
-
-	.item:nth-child(2) .rank_num,
-	.item:nth-child(3) .rank_num {
-		font-size: 20px;
-		font-weight: bolder;
-		margin-right: 20px;
-	}
-
-	.score {
-		position: absolute;;
-		right: 20px;
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	.user_img {
-		width: 50px;
-		margin-right: 20px;
-	}
-
-	.closed_btn {
-		position: absolute;
-		width: 50px;
-		height: 50px;
-		right: -25px;
-		top: -25px;
-		background: url('./images/closed_btn.png') center no-repeat;
-		background-size: 100% 100%;
-		z-index: 2;
-	}
-</style>
 </head>
 
 <body>
-	<!-- <div class="loading_hover">
-		<img src="images/game_logo.jpg" class="game_logo">
-	</div> -->
-	<div class="game_start_panel" id="gameStartPanel">
-		<img src="images/fingger.png" alt="操作提示" class="tip_img">
-	</div>
-	<div class="game_over_panel hide" id="gameOverPanel">
-		<div class="result_box">
-			<p>分数：<span id="score">0</span></p>
-		</div>
-		<img src="./images/replay.png" alt="重新开始" id="replay" class="replay_btn">
-		<div class="rank_link" id="rankLink"></div>
-	</div>
 
-	<div class="rank_list_out_box hide" id="rankListOutBox">
-		<div class="rank_list_box" id="rankListBox">
-			<span class="closed_btn" id="closedBtn"></span>
-			<div class="rank_list" id="rankList">
-				<div class="item">
-					<span class="rank_num">1</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">2</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">3</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">4</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">1</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">2</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">3</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">4</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">1</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">2</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">3</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-				<div class="item">
-					<span class="rank_num">4</span><img src="./images/default_user_img.jpg" class="user_img"><span class="user_name">Xx</span>
-					<span class="score">11</span>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<script type="text/javascript" src="hilo/hilo-standalone.js"></script>
-	<script type="text/javascript" src="hilo/hilo-flash.js" data-auto="true"></script>
-	<script type="text/javascript" src="src/game.js"></script>
-	<script type="text/javascript" src="src/Asset.js"></script>
-	<script type="text/javascript" src="src/Bg.js"></script>
-	<script type="text/javascript" src="src/River.js"></script>
-	<script type="text/javascript" src="src/Pillars.js"></script>
-	<script type="text/javascript" src="src/Frog.js"></script>
+	<script type="text/javascript" src="./libs/hilo-standalone.js"></script>
+	<script type="text/javascript" src="./libs/hilo-flash.js" data-auto="true"></script>
+	<script type="text/javascript" src="./js/game.js"></script>
+	<script type="text/javascript" src="./js/Asset.js"></script>
+	<script type="text/javascript" src="./js/ReadyScene.js"></script>
+	<script type="text/javascript" src="./js/OverScene.js"></script>
+	<script type="text/javascript" src="./js/Bg.js"></script>
+	<script type="text/javascript" src="./js/River.js"></script>
+	<script type="text/javascript" src="./js/Pillars.js"></script>
+	<script type="text/javascript" src="./js/Frog.js"></script>
 	<script type="text/javascript">
 
 		window.onload = function() {
+
 	        game.init();
 
 	        document.body.addEventListener('touchstart', function(e) {
 				e.preventDefault();
 				return false;
 			}, false);
-
-	        document.getElementById('gameStartPanel').addEventListener('touchstart', function(e) {
-	        	this.className = this.className + ' hide';
-				game.playClickButtonSound();
-			}, false);
-
-			document.getElementById('replay').addEventListener('touchstart', function(e) {
-				var gameOverPanel = document.getElementById('gameOverPanel')
-				gameOverPanel.className = gameOverPanel.className + ' hide';
-				game.playClickButtonSound();
-				game.resetGame();
-			}, false);
-
-			document.getElementById('rankLink').addEventListener('touchstart', function(e) {
-				var rankListOutBox = document.getElementById('rankListOutBox');
-				rankListOutBox.className = rankListOutBox.className.slice(0, rankListOutBox.className.indexOf(' hide'));
-			});
-
-			function loadData() {
-				alert('load data')
-			}
-
-			document.getElementById('rankListBox').addEventListener('scroll', function(e) {
-				if(this.scrollTop + this.offsetHeight >= document.getElementById('rankList').offsetHeight) {
-					loadData();
-				}
-			});
-
-			document.getElementById('closedBtn').addEventListener('touchstart', function(e) {
-				var rankListOutBox = document.getElementById('rankListOutBox');
-				rankListOutBox.className = rankListOutBox.className + ' hide';
-				game.playClickButtonSound();
-			});
 	    }
 
 		

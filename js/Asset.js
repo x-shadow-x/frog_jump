@@ -14,6 +14,10 @@
 
         load: function(){
             var resources = [
+                {id:'redyBg', src:'images/redy_bg.jpg'},
+                {id:'fingger', src:'images/fingger.png'},
+                {id:'gameOver', src:'images/game_over.png'},
+                {id:'replayBtn', src:'images/replay.png'},
                 {id:'bg', src:'images/bg.jpg'},
                 {id:'river', src:'images/river.png'},
                 {id:'frog', src:'images/frog.png'},
@@ -26,12 +30,16 @@
             this.queue.on('complete', this.onComplete.bind(this));
             this.queue.on('complete', this.onComplete.bind(this));
             this.queue.start();
-            this.queue.on('load', function(e){
+            this.queue.on('load', function(e) {
                 console.log(e.detail);
             });
         },
 
-        onComplete: function(e){
+        onComplete: function(e) {
+            this.redyBg = this.queue.get('redyBg').content;
+            this.fingger = this.queue.get('fingger').content;
+            this.gameOver = this.queue.get('gameOver').content;
+            this.replayBtn = this.queue.get('replayBtn').content;
             this.bg = this.queue.get('bg').content;
             this.river = this.queue.get('river').content;
             this.pillar = this.queue.get('pillar').content;

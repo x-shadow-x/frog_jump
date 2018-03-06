@@ -1,40 +1,31 @@
 (function() {
 
-    // window.onload = function() {
-    //     game.init();
-    // }
-
     var game = window.game = {
         width: 0,
         height: 0,
 
-        maxPillarDistance: 0,
-        bgBottom: 59, // 背景距离底部的距离
-        riverSpace: 20, // 将来将参数配置成变量用
-
-        numPillars: 3,
-        numOffscreenPillars: 1,
-
-        step: 0, // 跳跃的步数
+        maxPillarDistance: 0, // 柱子间的最大距离
+        bgBottom: 59, // 背景距离底部的距离,因为当前使用的背景高度较小，同时游戏中屏幕底部是河流，所以设置一定的距离，以便抬高背景
+        riverSpace: 10, // 三道河流文理之间的间距
+        numPillars: 3, // 柱子的个数
+        numOffscreenPillars: 1, // 屏幕中显示两根柱子，当移除屏幕的柱子个数超过 1 时开始处理循环使用柱子的逻辑
         distance: 0, // 青蛙跳跃的水平距离
+        touchTime: 0, //点击屏幕时的时间戳，以便计算出点击屏幕的时间
+        score: 0,
+        isJumping: false, // 记录是否处于正在跳跃的状态，以便防止在成功跳跃到下一根柱子场景还没来得及更新完就点击了下一次跳跃
 
-        touchTime: 0,
-
+        ticker: null, // 定时器
         asset: null,
         stage: null,
-        ticker: null,
-        score: 0,
-
+        gameReadyScene: null,
         bg: null,
+        frog: null,
         rivers: null,
-        bird: null,
         pillars: null,
 
         jumpSound: null,
         clickButtonSound: null,
         fallToWaterSound: null,
-
-        isJumping: false,
 
         init: function() {
             this.asset = new game.Asset();
@@ -117,12 +108,66 @@
             this.stage.on(Hilo.event.POINTER_END, this.handleTouchEnd.bind(this));
 
             //初始化
+            
             this.initBackground();
             this.initPillars();
             this.initFrog();
             this.initCurrentScore();
+            this.initScenes();
             //准备游戏
             this.gameReady();
+        },
+
+        initScenes: function(){
+            //准备场景
+            this.gameReadyScene = new game.ReadyScene({
+                id: 'readyScene',
+                width: this.width,
+                height: this.height,
+                redyBg: this.asset.redyBg,
+                finggerImg: this.asset.fingger,
+                clientWidth: this.width,
+                clientHeight: this.height
+            }).addTo(this.stage);
+
+            //结束场景
+            this.gameOverScene = new game.OverScene({
+                id: 'overScene',
+                // scorePanelX: this.width * 0.2 >> 0,
+                // scorePanelY: this.height * 0.2,
+                // scorePanelWidth: this.width * 0.6,
+                // scorePanelHeight: this.width * 0.4,
+                gameOverImg: this.asset.gameOver,
+                gameOverX: (this.width - this.asset.gameOver.width) / 2 >> 0,
+                gameOverY: this.width * 0.5,
+                replayBtnImg: this.asset.replayBtn,
+                replayBtnX: (this.width - this.asset.replayBtn.width) / 2 >> 0,
+                replayBtnY: this.width * 0.9,
+
+                visible: false
+            }).addTo(this.stage);
+
+            this.gameOverScene.getChildById('replay').on(Hilo.event.POINTER_START, function(e) {
+                e.stopImmediatePropagation();
+            }.bind(this));
+
+            this.gameOverScene.getChildById('replay').on(Hilo.event.POINTER_END, function(e) {
+                e.stopImmediatePropagation();
+                this.gameOverScene.visible = false;
+                this.playClickButtonSound();
+                this.resetGame();
+            }.bind(this));
+            
+
+
+            this.gameReadyScene.on(Hilo.event.POINTER_START, function(e) {
+                e.stopImmediatePropagation();
+            }.bind(this));
+            this.gameReadyScene.on(Hilo.event.POINTER_END, function(e) {
+                e.stopImmediatePropagation();
+                this.gameReadyScene.visible = false;
+                this.playClickButtonSound();
+            }.bind(this));
         },
 
         initBackground: function() {
@@ -138,7 +183,7 @@
                     rect: [0, 0, this.asset.river.width, 39],
                     clientWidth: this.width,
                     y: this.height - 79,
-                    step: 10,
+                    riverSpace: this.riverSpace,
                     offset: -78,
                     duration: 1800
                 }),
@@ -148,7 +193,7 @@
                     rect: [0, 39, this.asset.river.width, 39],
                     clientWidth: this.width,
                     y: this.height - 59,
-                    step: 10,
+                    riverSpace: this.riverSpace,
                     offset: -78,
                     duration: 1600
                 }),
@@ -158,7 +203,7 @@
                     rect: [0, 78, this.asset.river.width, 39],
                     clientWidth: this.width,
                     y: this.height - 39,
-                    step: 10,
+                    riverSpace: this.riverSpace,
                     offset: -78,
                     duration: 1000
                 })
@@ -247,11 +292,10 @@
 
         gameOver: function() {
             //显示结束场景
-            var gameOverPanel = document.getElementById('gameOverPanel');
-            gameOverPanel.className = gameOverPanel.className.slice(0, gameOverPanel.className.indexOf(' hide'));
-            document.getElementById('score').innerHTML = this.score;
             this.isGameOver = true;
             this.playFallToWaterSound();
+            this.gameOverScene.updateScore(this.score);
+            this.gameOverScene.visible = true;
         },
 
         resetGame: function() {
